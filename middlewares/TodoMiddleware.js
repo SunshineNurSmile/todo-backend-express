@@ -55,13 +55,13 @@ const updateTodoValidation = (req, res, next) => {
   next();
 };
 
-const deleteTodoValidation = (req, res, next) => {
+const todoIdValidation = (req, res, next) => {
   const { todoId } = req.body;
-  if (!validateTodoId(todoId)) {
+  if (!todoId || !validateTodoId(todoId)) {
     return res.status(400).json({ message: 'Invalid todo ID!' });
   }
 
   next();
 };
 
-export { createTodoValidation, updateTodoValidation, deleteTodoValidation };
+export { createTodoValidation, updateTodoValidation, todoIdValidation };

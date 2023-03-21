@@ -68,10 +68,37 @@ const updateTodo = async (req, res) => {
   }
 };
 
-const deleteTodo = async (req, res) => {
+const toggleStatus = async (req, res) => {
   const { todoId } = req.body;
+
+  try {
+    const todo = await Todo.findById(todoId);
+
+    if (!todo) {
+      return res.status(404).json({ message: 'Cannot find todo!' });
+    }
+
+    todo.status = !todo.status;
+
+    await todo.save();
+
+    res.status(200).json({ message: 'Todo status updated successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating todo status!' });
+  }
+};
+
+const deleteTodo = async (req, res) => {
+  const { todoId, userId } = req.body;
   try {
     await Todo.findByIdAndDelete(todoId);
+    const user = await User.findById(userId);
+    const filteredTodos = user.todos.filter((todo) => {
+      return todo._id != todoId;
+    });
+    user.todos = filteredTodos;
+    await user.save();
     res.status(200).json({ message: 'Todo deleted successfully!' });
   } catch (err) {
     console.error(err);
@@ -79,4 +106,4 @@ const deleteTodo = async (req, res) => {
   }
 };
 
-export { createTodo, getAllTodos, updateTodo, deleteTodo };
+export { createTodo, getAllTodos, updateTodo, toggleStatus, deleteTodo };

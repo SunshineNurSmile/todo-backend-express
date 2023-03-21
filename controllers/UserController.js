@@ -17,14 +17,14 @@ const createUser = async (req, res) => {
       password: hash,
     });
 
-    const jwt = generateToken(newUser._id);
+    const jwt = generateToken(newUser._id, username);
 
     res.cookie('jwt', jwt, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    res.status(201).json({ message: 'User created successfully!' });
+    res.status(201).json({ username });
   } catch (err) {
     console.err(err);
     res.status(500).json({ message: 'Error creating user!' });
@@ -39,7 +39,7 @@ const loginUser = async (req, res) => {
       .lean()
       .exec();
     if (!user) {
-      return res.status(204).json({ message: 'No user found!' });
+      return res.status(404).json({ message: 'No user found!' });
     }
 
     const hash = user.password;
@@ -48,14 +48,14 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Wrong password provided!' });
     }
 
-    const jwt = generateToken(user._id);
+    const jwt = generateToken(user._id, username);
 
     res.cookie('jwt', jwt, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    res.status(200).json({ message: 'Login successful!' });
+    res.status(200).json({ username });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error logging in user!' });
@@ -72,8 +72,9 @@ const logoutUser = (_req, res) => {
   }
 };
 
-const verifyLogin = (_req, res) => {
-  res.status(200).json({ valid: true });
+const verifyLogin = (req, res) => {
+  const { username } = req.body;
+  res.status(200).json({ valid: true, username });
 };
 
 export { createUser, loginUser, logoutUser, verifyLogin };

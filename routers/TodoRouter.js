@@ -10,7 +10,8 @@ router
   .route('/')
   .get(TodoController.getAllTodos)
   .post(TodoMiddleware.createTodoValidation, TodoController.createTodo)
-  .patch(TodoMiddleware.updateTodoValidation, TodoController.updateTodo)
-  .delete(TodoMiddleware.deleteTodoValidation, TodoController.deleteTodo);
+  .put(TodoMiddleware.updateTodoValidation, TodoController.updateTodo)
+  .patch(TodoMiddleware.todoIdValidation, TodoController.toggleStatus)
+  .delete(TodoMiddleware.todoIdValidation, TodoController.deleteTodo);
 
 export default router;
